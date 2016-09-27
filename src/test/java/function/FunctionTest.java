@@ -1,13 +1,16 @@
 package function;
 
-import function.Annotations.Declaration;
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import static function.Annotations.*;
+import org.junit.Test;
+
+import function.Annotations.Declaration;
+
+import static function.Annotations.BeforeJava8;
+import static function.Annotations.Java8;
+import static function.Annotations.Usage;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -19,7 +22,7 @@ public class FunctionTest {
     @BeforeJava8
     @Declaration
     public void functionUsingAnonymousClass() throws Exception {
-        Function<String, Integer> function  = new Function<String, Integer>() {
+        Function<String, Integer> function = new Function<String, Integer>() {
             @Override
             public Integer apply(String s) {
                 return Integer.valueOf(s);
@@ -31,13 +34,13 @@ public class FunctionTest {
     @BeforeJava8
     @Declaration
     public void functionUsingConcreteClass() throws Exception {
-        class MyFunction implements Function<String, Integer>{
+        class MyFunction implements Function<String, Integer> {
             @Override
             public Integer apply(String s) {
                 return Integer.valueOf(s);
             }
         }
-        class MyGenericFunction<T> implements Function<T,String>{
+        class MyGenericFunction<T> implements Function<T, String> {
             @Override
             public String apply(T t) {
                 return t.toString();
@@ -53,7 +56,7 @@ public class FunctionTest {
     @Java8
     @Declaration
     public void functionUsingLambda() throws Exception {
-        //R apply(T t); => Integer apply(String t);
+        // R apply(T t); => Integer apply(String t);
         Function<String, Integer> function1 = str -> Integer.valueOf(str);
         Function<String, Integer> function2 = (String str) -> Integer.valueOf(str);
         Function<String, Integer> function3 = (String str) -> {
@@ -66,13 +69,13 @@ public class FunctionTest {
     @Java8
     @Declaration
     public void functionUsingMethodReference() throws Exception {
-        //R apply(T t); => Integer apply(String t);
+        // R apply(T t); => Integer apply(String t);
         Function<String, Integer> function1 = Integer::valueOf;
-        //Function<String, Boolean> function2 = Integer::valueOf; //Doesn't compile
+        // Function<String, Boolean> function2 = Integer::valueOf; //Doesn't compile
         Function<String, Boolean> function3 = this::toBoolean;
     }
 
-    private Boolean toBoolean(String str){
+    private Boolean toBoolean(String str) {
         return Boolean.valueOf(str);
     }
 
@@ -97,21 +100,19 @@ public class FunctionTest {
     @Java8
     @Usage
     public void chainingFunctions() throws Exception {
-        //String -> Integer
+        // String -> Integer
         Function<String, Integer> f1 = Integer::valueOf;
-        //String -> Integer
+        // String -> Integer
         Function<Integer, String> f2 = i -> i.toString();
 
-        //String -> Integer -> String
-        //f1() -> f2()
-        //y = f2(f1(x))
-        Function<String, String> chainOfTwoFunctions =
-                f1.andThen(f2);
+        // String -> Integer -> String
+        // f1() -> f2()
+        // y = f2(f1(x))
+        Function<String, String> chainOfTwoFunctions = f1.andThen(f2);
         System.out.println(chainOfTwoFunctions.apply("10"));
 
-        //String -> Integer -> String -> Integer
-        Function<String, Integer> chainOfThreeFunctions =
-                f1.andThen(f2).andThen(f1);
+        // String -> Integer -> String -> Integer
+        Function<String, Integer> chainOfThreeFunctions = f1.andThen(f2).andThen(f1);
         System.out.println(chainOfThreeFunctions.apply("10"));
 
         System.out.println(f1.andThen(f2).apply("10"));
@@ -122,10 +123,10 @@ public class FunctionTest {
     @Usage
     public void functionalProgramming() throws Exception {
         Function<Integer, Integer> f = i -> i + 1;
-        //1 -> 1 + 1 = 2 -> 2 + 1 = 3
-        int sum = f.andThen(f).apply(1); //3
+        // 1 -> 1 + 1 = 2 -> 2 + 1 = 3
+        int sum = f.andThen(f).apply(1); // 3
         System.out.println(sum);
-        sum = f.andThen(f).andThen(f).apply(1); //4
+        sum = f.andThen(f).andThen(f).apply(1); // 4
         System.out.println(sum);
     }
 
@@ -135,9 +136,9 @@ public class FunctionTest {
     public void composeMethod() throws Exception {
         Function<String, Integer> f1 = Integer::valueOf;
         Function<Integer, String> f2 = String::valueOf;
-        //Integer -> String -> Integer
-        //f2() -> f1()
-        //y = f1(f2(x))
+        // Integer -> String -> Integer
+        // f2() -> f1()
+        // y = f1(f2(x))
         f1.compose(f2).apply(10);
     }
 
@@ -147,14 +148,13 @@ public class FunctionTest {
     public void guessWhat() throws Exception {
         Function<String, Integer> f1 = Integer::valueOf;
         Function<Integer, String> f2 = String::valueOf;
-        f1.compose(f2.andThen(f1).andThen(f2)).compose(f1).apply("10"); //10
+        System.out.println(f1.compose(f2.andThen(f1).andThen(f2)).compose(f1).apply("10")); // 10
 
         Function<Integer, Integer> f = i -> i + 1;
-        System.out.println(
-            f.compose(f.andThen(f).andThen(f)).compose(f).apply(1) //???
+        Function<Integer, Integer> fa = i -> i + 2;
+        System.out.println(f.compose(fa.andThen(f)).andThen(fa).compose(f).apply(1) // ???
         );
-        System.out.println(
-            f.compose(f.compose(f).andThen(f)).andThen(f).apply(1) //???
+        System.out.println(f.compose(f.compose(f).andThen(f)).andThen(f).apply(1) // ???
         );
     }
 }

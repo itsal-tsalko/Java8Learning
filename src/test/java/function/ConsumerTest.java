@@ -1,9 +1,13 @@
 package function;
 
-import function.Annotations.*;
+import java.util.function.Consumer;
+
 import org.junit.Test;
 
-import java.util.function.Consumer;
+import function.Annotations.BeforeJava8;
+import function.Annotations.Declaration;
+import function.Annotations.Java8;
+import function.Annotations.Usage;
 
 /**
  * @author Iuliia Tsal-Tsalko
@@ -26,13 +30,13 @@ public class ConsumerTest {
     @Declaration
     @BeforeJava8
     public void consumerUsingConcreteClass() throws Exception {
-        class GenericConsumer<T> implements Consumer<T>{
+        class GenericConsumer<T> implements Consumer<T> {
             @Override
             public void accept(T t) {
                 System.out.println(t);
             }
         }
-        class MyConsumer implements Consumer<String>{
+        class MyConsumer implements Consumer<String> {
             @Override
             public void accept(String s) {
                 System.out.println(s);
@@ -47,19 +51,25 @@ public class ConsumerTest {
     @Declaration
     @Java8
     public void consumerUsingLambda() throws Exception {
-        //void accept(T t); => void accept(String s);
-        Consumer<String> consumer1 = s -> {System.out.println(s);};
-        Consumer<String> consumer2 = (String s) -> {System.out.println(s);};
-        //Consumer<String> consumer3 = (Integer s) -> {System.out.println(s);}; //Doesn't compile
-        Consumer<Integer> consumer4 = (Integer s) -> {System.out.println(s);};
+        // void accept(T t); => void accept(String s);
+        Consumer<String> consumer1 = s -> {
+            System.out.println(s);
+        };
+        Consumer<String> consumer2 = (String s) -> {
+            System.out.println(s);
+        };
+        // Consumer<String> consumer3 = (Integer s) -> {System.out.println(s);}; //Doesn't compile
+        Consumer<Integer> consumer4 = (Integer s) -> {
+            System.out.println(s);
+        };
     }
 
     @Test
     @Declaration
     @Java8
     public void consumerUsingMethodReference() throws Exception {
-        //void accept(T t); => void accept(String s);
-        //                     void println(String x);
+        // void accept(T t); => void accept(String s);
+        // void println(String x);
         Consumer<String> consumer1 = System.out::println;
         Consumer<String> consumer2 = System.out::println;
         Consumer<Integer> consumer3 = System.out::println;
@@ -73,16 +83,16 @@ public class ConsumerTest {
         Consumer<Integer> consumer2 = System.out::println;
         consumer1 = this::toPrint;
         consumer1 = ConsumerTest::staticPrint;
-        //void accept(Integer i);
-        //consumer2 = this::toPrint;  //Doesn't compile
-        //consumer2 = ConsumerTest::staticPrint; //Doesn't compile
+        // void accept(Integer i);
+        // consumer2 = this::toPrint; //Doesn't compile
+        // consumer2 = ConsumerTest::staticPrint; //Doesn't compile
     }
 
-    private void toPrint(String s){
+    private void toPrint(String s) {
         System.out.println(s);
     }
 
-    public static void staticPrint(String s){
+    public static void staticPrint(String s) {
         System.out.println(s);
     }
 
@@ -92,9 +102,9 @@ public class ConsumerTest {
     public void usingConsumer() throws Exception {
         Consumer<String> consumer1 = System.out::println;
         Consumer<Integer> consumer2 = System.out::println;
-        //void accept(String t); => void println(String s);
+        // void accept(String t); => void println(String s);
         consumer1.accept("I love Yulya!");
-        //void accept(Integer t); => void println(Integer s);
+        // void accept(Integer t); => void println(Integer s);
         consumer2.accept(100);
     }
 
@@ -102,10 +112,10 @@ public class ConsumerTest {
     @Usage
     @Java8
     public void usingConsumerAsParameter() throws Exception {
-        class Processor{
-            //Higher order function (function consume other function)
-            public <T> void process(T object, Consumer<T> delegate){
-                System.out.println("Processing "+object);
+        class Processor {
+            // Higher order function (function consume other function)
+            public <T> void process(T object, Consumer<T> delegate) {
+                System.out.println("Processing " + object);
                 delegate.accept(object);
             }
         }
@@ -120,9 +130,9 @@ public class ConsumerTest {
     @Usage
     @Java8
     public void usingConsumerAsResult() throws Exception {
-        class ConsumerFactory{
-            //Factory method
-            public <T> Consumer<T> create(){
+        class ConsumerFactory {
+            // Factory method
+            public <T> Consumer<T> create() {
                 return System.out::println;
             }
         }
