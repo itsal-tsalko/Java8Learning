@@ -1,7 +1,13 @@
 package exercises;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -12,15 +18,18 @@ import static exercises.SegmentsIntersection.Segment.s;
  */
 public class SegmentsIntersection {
 
-    public static void main(String[] args) {
-        List<Segment> segments = new ArrayList<>();
-        Segment segment1 = s(0, 1);
-        Segment segment2 = s(2, 4);
-        Segment segment3 = s(5, 7);
-        segments.add(segment1);
-        segments.add(segment2);
-        segments.add(segment3);
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
+    @Before
+    public void setUp() throws Exception {
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Found segment (2, 4) intersection with (3, 7)");
+    }
+
+    @Test
+    public void testSegmentsIntersection() {
+        List<Segment> segments = Arrays.asList(s(0, 1), s(2, 4), s(3, 7));
         isSegmentsHaveIntersection(segments);
     }
 
@@ -28,7 +37,7 @@ public class SegmentsIntersection {
         segments.stream().sorted(Comparator.comparingInt(s -> s.p1))
                 .reduce((s1, s2) -> {
                     if (s2.p1 <= s1.p2) {
-                        throw new IllegalComponentStateException();
+                        throw new IllegalStateException(String.format("Found segment (%s, %s) intersection with (%s, %s)", s1.p1, s1.p2, s2.p1, s2.p2));
                     } else {
                         return s2;
                     }

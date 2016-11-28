@@ -1,9 +1,13 @@
 package exercises;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,22 +16,26 @@ import java.util.stream.Collectors;
  */
 public class PointsIntersectionLevel1 {
 
-    @Test(expected = IllegalStateException.class)
-    public void testPointsIntersectionUsingToMap() {
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
-        Point p1 = new Point(2, 0);
-        Point p2 = new Point(3, 0);
-        Point p3 = new Point(2, 0);
-        List<Point> points = new ArrayList<Point>();
-        points.add(p1);
-        points.add(p2);
-        points.add(p3);
-        points.stream().collect(Collectors.toMap(Point::getLocation, Point::getLocation));
+    @Before
+    public void setUp() throws Exception {
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Found duplicate point with 2 coordinate");
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testPointsIntersectionUsingGroupingBy() {
+    public void testPointsIntersectionUsingToMap() {
+        Point p1 = new Point(2, 0);
+        Point p2 = new Point(3, 0);
+        Point p3 = new Point(2, 0);
+        List<Point> points = Arrays.asList(p1, p2, p3);
+        points.stream().collect(Collectors.toMap(Point::getLocation, Point::getLocation));
+    }
 
+    @Test
+    public void testPointsIntersectionUsingGroupingBy() {
         Point p1 = new Point(2, 0);
         Point p2 = new Point(3, 0);
         Point p3 = new Point(2, 0);
@@ -38,14 +46,13 @@ public class PointsIntersectionLevel1 {
         points.stream().collect(Collectors.groupingBy(Point::getLocation, Collectors.counting()))
                 .forEach((k, v) -> {
                     if (v > 1) {
-                        throw new IllegalComponentStateException();
+                        throw new IllegalComponentStateException(String.format("Found duplicate point with %s coordinate", k.x));
                     }
                 });
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testPointsIntersectionUsingReduce() {
-
         Point p1 = new Point(2, 0);
         Point p2 = new Point(3, 0);
         Point p3 = new Point(2, 0);
@@ -57,12 +64,12 @@ public class PointsIntersectionLevel1 {
         points.stream()
                 .mapToInt(p -> (int) p.getX())
                 .sorted()
-                .reduce(this::reduce);
+                .reduce(this::intersectPoints);
     }
 
-    private int reduce(int a, int b) {
+    private int intersectPoints(int a, int b) {
         if (a == b) {
-            throw new IllegalComponentStateException();
+            throw new IllegalStateException(String.format("Found duplicate point with %s coordinate", a));
         } else {
             return Math.max(a, b);
         }
